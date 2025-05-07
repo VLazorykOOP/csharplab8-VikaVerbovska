@@ -20,7 +20,7 @@ public class Lab8T2
         string text = File.ReadAllText(inputFile);
 
         string pattern = @"\b(?:(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\.){3}(?:25[0-5]|2[0-4][0-9]|1?[0-9]{1,2})\b";
-        MatchCollection matches = Regex.Matches(text, pattern);
+        MatchCollection matches = Regex.Matches(text, pattern); //шукає всі збіги у тексті за заданим регулярним виразом.
 
         List<string> foundIPs = new List<string>();
         foreach (Match match in matches)
@@ -35,6 +35,13 @@ public class Lab8T2
         string oldIP = Console.ReadLine();
         Console.Write("Введіть нову IP-адресу: ");
         string newIP = Console.ReadLine();
+
+        // Перевірка, чи правильний формат IP
+        if (!Regex.IsMatch(oldIP, pattern) || !Regex.IsMatch(newIP, pattern))
+        {
+            Console.WriteLine("Невірний формат IP-адреси. Заміну не виконано.");
+            return;
+        }
 
         string replacedText = Regex.Replace(text, $@"\b{Regex.Escape(oldIP)}\b", newIP);
         File.WriteAllText(replacedFile, replacedText);

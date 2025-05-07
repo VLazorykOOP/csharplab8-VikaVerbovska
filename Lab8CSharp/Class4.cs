@@ -6,7 +6,7 @@ public class BinaryProcessor
 {
     public void Run()
     {
-        string filePath = @"D:\Універ\2 курс\КПП\lab8\Lab8CSharp\reciprocals.txt";
+        string filePath = @"D:\Універ\2 курс\КПП\lab8\Lab8CSharp\reciprocals.bin";
 
         Console.Write("Введіть n (натуральне число): ");
         if (!int.TryParse(Console.ReadLine(), out int n) || n <= 0)
@@ -15,10 +15,10 @@ public class BinaryProcessor
             return;
         }
 
-        WriteReciprocalsToText(filePath, n);
+        WriteReciprocalsToBinary(filePath, n);
         Console.WriteLine($"Файл '{filePath}' створено і записано числа 1, 1/2, ..., 1/{n}.");
 
-        List<double> multiplesOfThree = ReadMultiplesOfThreeFromText(filePath);
+        List<double> multiplesOfThree = ReadMultiplesOfThreeFromBinary(filePath);
         Console.WriteLine("Числа з порядковим номером, кратним 3:");
 
         int count = 3;
@@ -29,32 +29,36 @@ public class BinaryProcessor
         }
     }
 
-
-    public static void WriteReciprocalsToText(string filePath, int n)
+    // Записує зворотні числа у двійковий файл
+    public static void WriteReciprocalsToBinary(string filePath, int n)
     {
-        using (StreamWriter writer = new StreamWriter(filePath))
+        using (BinaryWriter writer = new BinaryWriter(File.Open(filePath, FileMode.Create)))
         {
             for (int i = 1; i <= n; i++)
             {
                 double value = 1.0 / i;
-                writer.WriteLine(value);
+                writer.Write(value);
             }
         }
     }
 
-    public static List<double> ReadMultiplesOfThreeFromText(string filePath)
+    // Читає числа з двійкового файлу, що мають порядковий номер, кратний 3
+    public static List<double> ReadMultiplesOfThreeFromBinary(string filePath)
     {
         List<double> result = new List<double>();
-        string[] lines = File.ReadAllLines(filePath);
-
-        for (int i = 2; i < lines.Length; i += 3) // 2, 5, 8, ... бо індексація з 0
+        using (BinaryReader reader = new BinaryReader(File.Open(filePath, FileMode.Open)))
         {
-            if (double.TryParse(lines[i], out double val))
+            int index = 1;
+            while (reader.BaseStream.Position < reader.BaseStream.Length)
             {
-                result.Add(val);
+                double value = reader.ReadDouble();
+                if (index % 3 == 0)
+                {
+                    result.Add(value);
+                }
+                index++;
             }
         }
-
         return result;
     }
 }
